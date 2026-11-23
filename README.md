@@ -25,7 +25,9 @@ How many seats go empty, and how much revenue do we lose, when passengers cancel
 7. Save and exit
 
 ## Files
-- `main.py` - runs the menu
+- `main.py` - runs the menu loop and shows the menu
+- `airline.py` - loads, saves, views, adds, and books flights and bookings
+- `reports.py` - builds the revenue totals, the text report, and the charts
 - `flights.csv` - flight prices and booked seats
 - `bookings.csv` - bookings that have been recorded
 - `revenue_by_flight.png` - bar chart of revenue for each flight
