@@ -1,5 +1,6 @@
 import csv
 import os
+import matplotlib.pyplot as plt
 flights = {}
 FLIGHTS_FILE = "flights.csv"
 BOOKINGS_FILE = "bookings.csv"
@@ -40,8 +41,7 @@ def show_menu():
     print("4. Add Flight")
     print("5. Booking Report")
     print("6. Charts")
-    print("7. Run Cancellation Simulation")
-    print("8. Save and Exit")
+    print("7. Save and Exit")
 
 def add_flight():
     dest = input("Enter the destination airport code (e.g., DEN, SEA): ").strip().upper()
@@ -80,15 +80,17 @@ def main():
             add_flight()
         elif choice == "5":
             show_report(bookings)
-        elif choice in ("3", "6", "7"):
+        elif choice == "6":
+            make_charts(flights, bookings)
+        elif choice == "3":
             print("Coming soon\n")
-        elif choice == "8":
+        elif choice == "7":
             save_flights()
             save_bookings()
             print("Data saved. Exiting the program.")
             break
         else:
-            print("Invalid choice. Please enter a number from 1 to 8.\n")
+            print("Invalid choice. Please enter a number from 1 to 7.\n")
 
 def get_price(prompt):
     while True:
@@ -204,6 +206,45 @@ def show_report(bookings):
     for code, amount in revenue.items():
         print(f"   {code} ${amount:.2f}")
     print()
+
+
+# Draws two bar charts, saves them as .png files, and shows them.
+def make_charts(flights, bookings):
+    if len(bookings) == 0:
+        print("No bookings yet, so there is nothing to chart.\n")
+        return
+
+    # Chart 1: total revenue for each flight
+    revenue = revenue_by_flight(bookings)
+    codes = []
+    amounts = []
+    for code, amount in revenue.items():
+        codes.append(code)
+        amounts.append(amount)
+
+    plt.figure()
+    plt.bar(codes, amounts)
+    plt.title("Total Revenue by Flight")
+    plt.xlabel("Flight (destination)")
+    plt.ylabel("Revenue ($)")
+    plt.savefig("revenue_by_flight.png")
+
+    # Chart 2: empty seats on each flight
+    codes = []
+    empty = []
+    for code, info in flights.items():
+        codes.append(code)
+        empty.append(FIRST_SEATS + ECON_SEATS - info["first_booked"] - info["econ_booked"])
+
+    plt.figure()
+    plt.bar(codes, empty)
+    plt.title("Empty Seats by Flight")
+    plt.xlabel("Flight (destination)")
+    plt.ylabel("Empty seats")
+    plt.savefig("empty_seats_by_flight.png")
+
+    print("Charts saved as revenue_by_flight.png and empty_seats_by_flight.png.\n")
+    plt.show()
 
 
 if __name__ == "__main__":
