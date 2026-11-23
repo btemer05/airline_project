@@ -36,11 +36,12 @@ def save_flights():
 def show_menu():
     print("1. View Flights")
     print("2. Book Passenger")
-    print("3. coming soon")
+    print("3. Cancel a Booking")
     print("4. Add Flight")
-    print("5. coming soon")
-    print("6. coming soon")
-    print("7. Exit")
+    print("5. Booking Report")
+    print("6. Charts")
+    print("7. Run Cancellation Simulation")
+    print("8. Save and Exit")
 
 def add_flight():
     dest = input("Enter the destination airport code (e.g., DEN, SEA): ").strip().upper()
@@ -77,13 +78,17 @@ def main():
             book_passenger()
         elif choice == "4":
             add_flight()
-        elif choice == "7":
+        elif choice == "5":
+            show_report(bookings)
+        elif choice in ("3", "6", "7"):
+            print("Coming soon\n")
+        elif choice == "8":
             save_flights()
             save_bookings()
             print("Data saved. Exiting the program.")
             break
         else:
-            print("Invalid choice. Please enter a number from 1 to 7.\n")
+            print("Invalid choice. Please enter a number from 1 to 8.\n")
 
 def get_price(prompt):
     while True:
@@ -147,5 +152,59 @@ def book_passenger():
 
     bookings.append({"flight": code, "passenger": name, "seat_class": seat_class, "fare": fare})
     print(f"Booked {name} on {code} in {seat_class} for ${fare:.2f}.\n")
+
+
+# Builds a dictionary of total revenue for each flight, like {"DEN": 438.00}.
+def revenue_by_flight(bookings):
+    totals = {}
+    for b in bookings:
+        code = b["flight"]
+        if code in totals:
+            totals[code] += b["fare"]
+        else:
+            totals[code] = b["fare"]
+    return totals
+
+
+# Prints a summary of all bookings, or a message if there are none.
+def show_report(bookings):
+    if len(bookings) == 0:
+        print("No bookings yet. Book a passenger first.\n")
+        return
+
+    total_revenue = 0
+    first_count = 0
+    econ_count = 0
+    for b in bookings:
+        total_revenue += b["fare"]
+        if b["seat_class"] == "first":
+            first_count += 1
+        else:
+            econ_count += 1
+
+    count = len(bookings)
+    average = total_revenue / count
+    revenue = revenue_by_flight(bookings)
+
+    top_code = ""
+    top_amount = 0
+    for code, amount in revenue.items():
+        if amount > top_amount:
+            top_code = code
+            top_amount = amount
+
+    print("\n--- Booking Report ---")
+    print(f"Bookings recorded:  {count}")
+    print(f"First class:        {first_count}")
+    print(f"Economy:            {econ_count}")
+    print(f"Total revenue:      ${total_revenue:.2f}")
+    print(f"Average fare:       ${average:.2f}")
+    print(f"Top flight:         {top_code} (${top_amount:.2f})")
+    print("\nRevenue by flight:")
+    for code, amount in revenue.items():
+        print(f"   {code} ${amount:.2f}")
+    print()
+
+
 if __name__ == "__main__":
     main()
